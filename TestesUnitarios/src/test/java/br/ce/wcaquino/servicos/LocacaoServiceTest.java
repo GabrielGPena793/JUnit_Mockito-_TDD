@@ -62,7 +62,6 @@ public class LocacaoServiceTest {
         List<Filme> filmes = Arrays.asList(new Filme("Jujutso", 0, 30.5),
                 new Filme("Jujutso", 0, 30.5));
 
-
         //action
         try {
             Locacao locacao1 = service.alugarFilme(usuario,filmes);
@@ -92,7 +91,6 @@ public class LocacaoServiceTest {
         List<Filme> filmes = Arrays.asList(new Filme("Jujutso", 2, 30.5),
                 new Filme("Jujutso", 2, 30.5));
 
-
         //action
         try {
             Locacao locacao1 = service.alugarFilme(null,filmes);
@@ -115,63 +113,6 @@ public class LocacaoServiceTest {
         } catch (LocadoraExecption e) {
             Assert.assertEquals("Filme vazio", e.getMessage());
         }
-    }
-
-
-    @Test
-    public void devePagar75PorcentoNoFilme3() throws FilmesSemEstoqueExecption, LocadoraExecption {
-        //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0),new Filme("Narnia", 1, 4.0));
-        //ação
-        Locacao resultado = service.alugarFilme(usuario,filmes);
-
-        //verificação
-        Assert.assertEquals(11, resultado.getValor(), 0.01);
-    }
-
-    @Test
-    public void devePagar50PorcentoNoFilme4() throws FilmesSemEstoqueExecption, LocadoraExecption {
-        //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0),new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0));
-        //ação
-        Locacao resultado = service.alugarFilme(usuario,filmes);
-
-        //verificação
-        Assert.assertEquals(13, resultado.getValor(), 0.01);
-    }
-
-    @Test
-    public void devePagar25PorcentoNoFilme5() throws FilmesSemEstoqueExecption, LocadoraExecption {
-        //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0),new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0), new Filme("Narnia", 1, 4.0));
-        //ação
-        Locacao resultado = service.alugarFilme(usuario,filmes);
-
-        //verificação
-        Assert.assertEquals(14, resultado.getValor(), 0.01);
-    }
-
-    @Test
-    public void devePagarZeroNoFilme6() throws FilmesSemEstoqueExecption, LocadoraExecption {
-        //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0),new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0), new Filme("Narnia", 1, 4.0),
-                new Filme("Narnia", 1, 4.0));
-        //ação
-        Locacao resultado = service.alugarFilme(usuario,filmes);
-
-        //verificação
-        Assert.assertEquals(14, resultado.getValor(), 0.01);
     }
 
     @Test
