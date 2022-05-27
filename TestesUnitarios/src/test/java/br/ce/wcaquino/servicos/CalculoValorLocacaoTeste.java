@@ -1,5 +1,8 @@
 package br.ce.wcaquino.servicos;
 
+import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
+import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
+
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -33,11 +36,11 @@ public class CalculoValorLocacaoTeste {
         service = new LocacaoService();
     }
 
-    private static Filme filme1 = new Filme("Narnia", 1, 4.0);
-    private static Filme filme2 = new Filme("Narnia", 1, 4.0);
-    private static Filme filme3 = new Filme("Narnia", 1, 4.0);
-    private static Filme filme4 = new Filme("Narnia", 1, 4.0);
-    private static Filme filme5 = new Filme("Narnia", 1, 4.0);
+    private static Filme filme1 =  umFilme().agora();
+    private static Filme filme2 = umFilme().agora();
+    private static Filme filme3 = umFilme().agora();
+    private static Filme filme4 = umFilme().agora();
+    private static Filme filme5 = umFilme().agora();
     private static Filme filme6 = new Filme("Narnia", 1, 4.0);
 
     @Parameterized.Parameters(name = "{2}") // collection que vai rodar a quatidade de vezes que for o tamanho da collection
@@ -53,7 +56,7 @@ public class CalculoValorLocacaoTeste {
     @Test
     public void deveCalcularOvalorDaLocacaoConsiderandoDescontos() throws FilmesSemEstoqueExecption, LocadoraExecption {
         //cenário
-        Usuario usuario = new Usuario("Gabriel");
+        Usuario usuario = umUsuario().agora();
 
         //ação
         Locacao resultado = service.alugarFilme(usuario, filmes);

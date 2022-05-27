@@ -14,6 +14,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
+import static br.ce.wcaquino.builder.FilmeBuilder.umFilmeComZeroDeEsotoque;
+import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
+
 public class LocacaoServiceTest {
 
     private LocacaoService service;
@@ -31,9 +35,9 @@ public class LocacaoServiceTest {
         Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
         //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Jujutso", 2, 30.5),
-                new Filme("Jujutso", 2, 30.5));
+        Usuario usuario = umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilme().comPreco(30.5).agora(),
+                umFilme().comPreco(30.5).agora());
 
         //action
         Locacao locacao1 = service.alugarFilme(usuario,filmes);
@@ -47,9 +51,9 @@ public class LocacaoServiceTest {
     @Test(expected = FilmesSemEstoqueExecption.class)
     public void deveLançarExcecaoAoAlugarFilmeSemEstoque() throws Exception {
         //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Jujutso", 0, 30.5),
-                new Filme("Jujutso", 0, 30.5));
+        Usuario usuario = umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilmeComZeroDeEsotoque().agora(),
+                umFilmeComZeroDeEsotoque().agora());
 
         //action
         Locacao locacao1 = service.alugarFilme(usuario,filmes);
@@ -58,9 +62,9 @@ public class LocacaoServiceTest {
     @Test
     public void deveLançarExcecaoAoAlugarFilmeSemEstoque_Robusta(){
         //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Jujutso", 0, 30.5),
-                new Filme("Jujutso", 0, 30.5));
+        Usuario usuario = umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilmeComZeroDeEsotoque().agora(),
+                umFilmeComZeroDeEsotoque().agora());
 
         //action
         try {
@@ -74,9 +78,9 @@ public class LocacaoServiceTest {
     @Test
     public void deveLançarExcecaoAoAlugarFilmeSemEstoque_FormaNova() throws Exception {
         //cenário
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Jujutso", 0, 30.5),
-                new Filme("Jujutso", 0, 30.5));
+        Usuario usuario = umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilmeComZeroDeEsotoque().agora(),
+                umFilmeComZeroDeEsotoque().agora());
 
         expectedException.expect(Exception.class);
         expectedException.expectMessage("Filmes sem estoque");
@@ -88,8 +92,8 @@ public class LocacaoServiceTest {
     @Test
     public void naoDeveAlugarFilmeSemUsuario() throws FilmesSemEstoqueExecption {
         //cenário
-        List<Filme> filmes = Arrays.asList(new Filme("Jujutso", 2, 30.5),
-                new Filme("Jujutso", 2, 30.5));
+        List<Filme> filmes = Arrays.asList(umFilme().comPreco(30.5).agora(),
+                umFilme().comPreco(30.5).agora());
 
         //action
         try {
@@ -104,7 +108,7 @@ public class LocacaoServiceTest {
     @Test
     public void naoDeveAlugarFilmeSemFilme() throws FilmesSemEstoqueExecption {
         //cenário
-        Usuario usuario = new Usuario("Gabriel");
+        Usuario usuario = umUsuario().agora();
 
         //action
         try {
@@ -120,8 +124,8 @@ public class LocacaoServiceTest {
         Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
         //cenario
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = List.of(new Filme("Narnia", 1, 4.0));
+        Usuario usuario = umUsuario().agora();
+        List<Filme> filmes = List.of(umFilme().agora());
 
         //ação
         Locacao retorno = service.alugarFilme(usuario,filmes);
