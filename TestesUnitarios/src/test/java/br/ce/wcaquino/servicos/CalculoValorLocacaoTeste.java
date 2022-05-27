@@ -56,9 +56,9 @@ public class CalculoValorLocacaoTeste {
         Usuario usuario = new Usuario("Gabriel");
 
         //ação
-        Locacao resultado = service.alugarFilme(usuario,filmes);
+        Locacao resultado = service.alugarFilme(usuario, filmes);
 
         //verificação
-        Assert.assertEquals( valorLocacao, resultado.getValor(), 0.01);
+        Assert.assertEquals(valorLocacao, resultado.getValor(), 0.01);
     }
 }
