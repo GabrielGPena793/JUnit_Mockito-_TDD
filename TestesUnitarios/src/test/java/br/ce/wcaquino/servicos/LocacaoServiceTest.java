@@ -9,10 +9,7 @@ import br.ce.wcaquino.exceptions.LocadoraExecption;
 import br.ce.wcaquino.utils.DataUtils;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -148,7 +145,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void naoDeveAlugarFilmeParaNegativadoSPC() throws FilmesSemEstoqueExecption {
+    public void naoDeveAlugarFilmeParaNegativadoSPC() throws Exception {
         //Cenario
         Usuario usuario = umUsuario().agora();
         List<Filme> filmes = List.of(umFilme().agora());
@@ -192,4 +189,22 @@ public class LocacaoServiceTest {
         Mockito.verifyNoMoreInteractions(emailService); // verifica se não houve mais nenhuma chamada com o mock além das que foram especificadas a cima
         Mockito.verifyNoInteractions(spcService); // verifica se o mock nunca foi chamado
     }
+
+    @Test
+    public void deveTratarErroNoSpc() throws Exception {
+        //cenário
+        Usuario usuario = umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilme().agora());
+        Mockito.when(spcService.possuiNegativacao(usuario)).thenThrow(new Exception("Problema com SPC, tente novamente"));
+
+
+        //verificação
+        expectedException.expect(LocadoraExecption.class);
+        expectedException.expectMessage("Problema com SPC, tente novamente");
+
+        //ação
+        service.alugarFilme(usuario,filmes);
+    }
+
+
 }
