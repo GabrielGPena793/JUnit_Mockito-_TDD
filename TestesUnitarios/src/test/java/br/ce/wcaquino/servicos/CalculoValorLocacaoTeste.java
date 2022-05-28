@@ -3,6 +3,7 @@ package br.ce.wcaquino.servicos;
 import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
 import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
 
+import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -13,6 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,8 +26,12 @@ import java.util.List;
 @RunWith(Parameterized.class)
 public class CalculoValorLocacaoTeste {
 
+    @InjectMocks
     private LocacaoService service;
-
+    @Mock
+    private LocacaoDao dao;
+    @Mock
+    private SPCService spcService;
     @Parameterized.Parameter            //paramentros que vamos usar precisamos definir
     public List<Filme> filmes;
     @Parameterized.Parameter(value = 1) //paramentros que vamos usar precisamos definir
@@ -33,7 +42,7 @@ public class CalculoValorLocacaoTeste {
 
     @Before
     public  void setup(){
-        service = new LocacaoService();
+        MockitoAnnotations.openMocks(this);
     }
 
     private static Filme filme1 =  umFilme().agora();

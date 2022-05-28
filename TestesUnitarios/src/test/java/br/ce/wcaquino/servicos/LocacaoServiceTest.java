@@ -1,5 +1,6 @@
 package br.ce.wcaquino.servicos;
 
+import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -8,6 +9,10 @@ import br.ce.wcaquino.exceptions.LocadoraExecption;
 import br.ce.wcaquino.utils.DataUtils;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -16,18 +21,25 @@ import java.util.List;
 
 import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
 import static br.ce.wcaquino.builder.FilmeBuilder.umFilmeComZeroDeEsotoque;
+import static br.ce.wcaquino.builder.LocacaoBuilder.umaLocacao;
 import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
 
 public class LocacaoServiceTest {
 
+    @InjectMocks
     private LocacaoService service;
-
+    @Mock
+    private SPCService spcService;
+    @Mock
+    private LocacaoDao dao;
+    @Mock
+    private EmailService emailService;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public  void setup(){
-        service = new LocacaoService();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -131,7 +143,53 @@ public class LocacaoServiceTest {
         Locacao retorno = service.alugarFilme(usuario,filmes);
 
         //verificação
-        boolean ehSegunda = DataUtils.verificarDiaSemana(retorno.getDataLocacao(), Calendar.MONDAY);
+        boolean ehSegunda = DataUtils.verificarDiaSemana(retorno.getDataRetorno(), Calendar.MONDAY);
         Assert.assertTrue(ehSegunda);
+    }
+
+    @Test
+    public void naoDeveAlugarFilmeParaNegativadoSPC() throws FilmesSemEstoqueExecption {
+        //Cenario
+        Usuario usuario = umUsuario().agora();
+        List<Filme> filmes = List.of(umFilme().agora());
+
+        Mockito.when(spcService.possuiNegativacao(Mockito.any(Usuario.class))).thenReturn(true);
+
+        //ação
+        try {
+            service.alugarFilme(usuario, filmes);
+            //verificacao
+            Assert.fail("Deveria lançar uma exceção");
+        } catch (LocadoraExecption e) {
+            Assert.assertEquals("Usuário Negativado",e.getMessage());
+        }
+
+        Mockito.verify(spcService).possuiNegativacao(usuario);
+    }
+
+    @Test
+    public void deveEnviarEmailParaLocacoesAtrasadas(){
+        //cenário
+        Usuario usuario = umUsuario().agora();
+        Usuario usuario2 = umUsuario().comNome("GG").agora();
+        Usuario usuario3 = umUsuario().comNome("GGWP").agora();
+        List<Locacao> locacoes = Arrays.asList(
+                umaLocacao().atrasada().comUsuario(usuario).agora(),
+                umaLocacao().comUsuario(usuario2).agora(),
+                umaLocacao().atrasada().comUsuario(usuario3).agora(),
+                umaLocacao().atrasada().comUsuario(usuario3).agora());
+
+        Mockito.when(dao.obterLocacoesPendentes()).thenReturn(locacoes);
+
+        //ação
+        service.notificarAtrasos();
+
+        //verificacao
+        Mockito.verify(emailService, Mockito.times(3)).notificarAtraso(Mockito.any(Usuario.class));
+        Mockito.verify(emailService).notificarAtraso(usuario);
+        Mockito.verify(emailService, Mockito.atLeastOnce()).notificarAtraso(usuario3);
+        Mockito.verify(emailService, Mockito.never()).notificarAtraso(usuario2);
+        Mockito.verifyNoMoreInteractions(emailService); // verifica se não houve mais nenhuma chamada com o mock além das que foram especificadas a cima
+        Mockito.verifyNoInteractions(spcService); // verifica se o mock nunca foi chamado
     }
 }

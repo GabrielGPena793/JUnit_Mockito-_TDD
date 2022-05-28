@@ -1,5 +1,6 @@
 package br.ce.wcaquino.servicos;
 
+import br.ce.wcaquino.dao.LocacaoDao;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -14,7 +15,12 @@ import java.util.List;
 import static br.ce.wcaquino.utils.DataUtils.adicionarDias;
 
 public class LocacaoService {
-	
+
+	private LocacaoDao locacaoDao;
+	private SPCService service;
+	private EmailService emailService;
+
+
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws LocadoraExecption, FilmesSemEstoqueExecption {
 
 		if (usuario == null){
@@ -29,8 +35,12 @@ public class LocacaoService {
 			throw new FilmesSemEstoqueExecption("Filmes sem estoque");
 		}
 
+		if (service.possuiNegativacao(usuario)){
+			throw new LocadoraExecption("Usuário Negativado");
+		}
+
 		Locacao locacao = new Locacao();
-		locacao.setFilme(filmes);
+		locacao.setFilmes(filmes);
 		locacao.setUsuario(usuario);
 		locacao.setDataLocacao(new Date());
 		Double valorTotal = 0.0;
@@ -55,9 +65,17 @@ public class LocacaoService {
 		
 		//Salvando a locacao...	
 		//TODO adicionar método para salvar
-		
+		locacaoDao.salvar(locacao);
+
 		return locacao;
 	}
 
-
+	public void notificarAtrasos(){
+		List<Locacao> locacoes = locacaoDao.obterLocacoesPendentes();
+		locacoes.forEach(locacao -> {
+			if (locacao.getDataRetorno().before(new Date())){
+				emailService.notificarAtraso(locacao.getUsuario());
+			}
+		});
+	}
 }
