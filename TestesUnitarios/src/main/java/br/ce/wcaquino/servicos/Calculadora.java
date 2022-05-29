@@ -3,6 +3,10 @@ package br.ce.wcaquino.servicos;
 import br.ce.wcaquino.exceptions.NaoPodeDividirPorZeroException;
 
 public class Calculadora {
+
+    public Calculadora() {
+    }
+
     public int sum(int a, int b) {
         return a + b;
     }

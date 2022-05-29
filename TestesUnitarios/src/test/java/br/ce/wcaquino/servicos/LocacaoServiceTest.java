@@ -21,9 +21,10 @@ import static br.ce.wcaquino.builder.FilmeBuilder.umFilmeComZeroDeEsotoque;
 import static br.ce.wcaquino.builder.LocacaoBuilder.umaLocacao;
 import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
 
+
 public class LocacaoServiceTest {
 
-    @InjectMocks
+    @InjectMocks @Spy
     private LocacaoService service;
     @Mock
     private SPCService spcService;
@@ -129,13 +130,12 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void deveDevolverNaSegundaAoAlugarNoSabado() throws FilmesSemEstoqueExecption, LocadoraExecption {
-        Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
-
+    public void deveDevolverNaSegundaAoAlugarNoSabado() throws Exception {
         //cenario
         Usuario usuario = umUsuario().agora();
         List<Filme> filmes = List.of(umFilme().agora());
 
+        Mockito.doReturn(DataUtils.obterData(28,05,2022)).when(service).obterData();
         //ação
         Locacao retorno = service.alugarFilme(usuario,filmes);
 
